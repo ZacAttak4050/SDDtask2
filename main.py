@@ -23,6 +23,7 @@ class Game():
         self.playing = True
 
         while self.playing:
+
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
@@ -44,7 +45,8 @@ class Game():
 
     # This is to 'draw' up the display of the game.
     def draw(self):
-        self.screen.fill(BGCOLOR)
+        self.screen.fill(WHITE)
+        self.screen.blit(GRASS, (0,0))
         self.all_sprites.draw(self.screen)
         pygame.display.flip()
 

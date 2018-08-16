@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, os
 from config import *
 from sprites import *
 from textures import *

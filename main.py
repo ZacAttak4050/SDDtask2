@@ -1,10 +1,7 @@
-import pygame, sys, os
+import pygame, sys
 from config import *
 from sprites import *
-#from textures import *
-from menu import *
-from 
-
+from textures import *
 
 
 class Game():

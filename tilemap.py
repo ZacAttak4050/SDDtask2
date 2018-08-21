@@ -1,5 +1,4 @@
 #tilemap.py
-
 from textures import *
 
 # Constants representing different resources

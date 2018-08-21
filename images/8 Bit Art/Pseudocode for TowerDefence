@@ -1,0 +1,56 @@
+ALGORITHM
+BEGIN Game:
+	# Player's Stats
+	lives = 100
+	starting money = $20
+
+	# Towers and their costs.
+  Level 1 Tower = $5
+  Level 2 Tower = $10
+  Level 3 Tower = $25
+  Level 4 Tower = $50
+
+  Player chooses map(s).
+	Import and Initialise chosen map.
+  wave = n 													# n is the number of waves
+  IF Player places Tower THEN:
+  	DISPLAY "Wave ('n')"
+	ENDIF
+
+END Game
+
+BEGIN wave(n):
+	CASEWHERE animal defeated:
+  	Level 1 Animal: money + 1, DISPLAY money
+		Level 2 Animal: money + 2, DISPLAY money
+    Level 3 Animal: money + 4, DISPLAY money
+    Level 4 Animal: money + 8, DISPLAY money
+    Level 5 Animal: money + 16, DISPLAY money
+    Level 6 Animal: money + 22, DISPLAY money
+  ENDCASE
+
+  CASEWHERE animal reaches base:
+   	Level 1 Animal: lives - 1, DISPLAY lives
+    Level 2 Animal: lives - 2, DISPLAY lives
+    Level 3 Animal: lives - 4, DISPLAY lives
+    Level 4 Animal: lives - 8, DISPLAY lives
+    Level 5 Animal: lives - 16, DISPLAY lives
+    Level 6 Animal: lives - 22, DISPLAY lives
+  ENDCASE
+
+  IF all animals in wave(n) defeated THEN:
+    Set Timer to 5 seconds.
+    IF timer = 0 THEN:
+      n = n + 1
+      DISPLAY "Wave ('n')"
+			BEGIN wave(n)
+		ENDIF
+	ENDIF
+
+  REPEAT-UNTIL lives = 0:
+		IF lives = 0 THEN:
+			END wave(n)
+			score = money
+			DISPLAY score
+
+		ENDIF

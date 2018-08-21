@@ -1,7 +1,11 @@
 import pygame, sys
 from config import *
-from sprites import *
-from textures import *
+from animals import *
+from calculations import *
+from menu import *
+from gridmap import *
+from tilemap import *
+from towers import *
 
 
 class Game():

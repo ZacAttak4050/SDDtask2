@@ -1,5 +1,11 @@
 #tilemap.py
 from textures import *
+import pygame
+
+pygame.init()
+
+DISPLPAYSURF = pygame.display.set_mode((800, 600), 0, 32)
+pygame.display.set_caption('Barn Defense')
 
 # Constants representing different resources
 DIRT = 0
@@ -43,3 +49,14 @@ tilemap = [
   [GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, STONE, GRASS, GRASS, DIRT, DIRT, DIRT, DIRT, DIRT, GRASS, GRASS, GRASS],
   [GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, GRASS, BLACK, BLACK, GRASS, GRASS, GRASS]
 ]
+
+  
+#pygame.display.flip
+pygame.draw.rect(DISPLAYSURF, color, (column*TILESIZE, row*TILESIZE, TILESIZE, TILESIZE))
+
+while True:
+  for event in pygame.event.get():
+    if event.type == QUIT:
+      pygame.quit()
+      sys.exit()
+  pygame.display.update()

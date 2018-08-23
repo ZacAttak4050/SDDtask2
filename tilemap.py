@@ -4,7 +4,7 @@ import pygame
 
 pygame.init()
 
-DISPLPAYSURF = pygame.display.set_mode((800, 600), 0, 32)
+SCREEN = pygame.display.set_mode((800, 600), 0, 32)
 pygame.display.set_caption('Barn Defense')
 
 # Constants representing different resources
@@ -13,6 +13,7 @@ GRASS = 1
 WATER = 2
 STONE = 3
 BLACK = 4
+TILESIZE = 32
 
 # Constants representing Colour
 BROWN = (120, 72, 0)
@@ -52,7 +53,7 @@ tilemap = [
 
   
 #pygame.display.flip
-pygame.draw.rect(DISPLAYSURF, color, (column*TILESIZE, row*TILESIZE, TILESIZE, TILESIZE))
+pygame.draw.rect(SCREEN, color, (column*TILESIZE, row*TILESIZE, TILESIZE, TILESIZE))
 
 while True:
   for event in pygame.event.get():

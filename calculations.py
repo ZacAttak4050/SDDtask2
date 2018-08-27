@@ -1,4 +1,5 @@
 from math import sqrt
+
 def get_Percentage(Max, Value):
     fraction = float(Value) / Max
     return fraction
@@ -19,11 +20,11 @@ class Timer(object):
            Callback: callable when the timer/interval expires.
            Onetimer: True for a timer that only acts once.
         """
-    self.interval = interval
-    self.callback = callback
-    self.onetimer = oneshot
-    self.time = 0
-    self.alive = True
+        self.interval = interval
+        self.callback = callback
+        self.onetimer = onetimer
+        self.time = 0
+        self.alive = True
 
     def update(self, time_passed):
         if not self.alive:

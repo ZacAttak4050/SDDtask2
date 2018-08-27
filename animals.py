@@ -2,12 +2,11 @@ import pygame
 from config import *
 from main import *
 from calculations import get_Percentage
-import widgets
 
 class animals(Sprite):
     def __init__(self, screen, x, y, level, game, init_position=None, init_direction = (1,1)):
         Sprite.__init__(self)
-        self.id = game._spawned_creep_count
+        self.id = game.animal_count
         self.screen = screen
         self.game = game
         self.x = x
@@ -15,10 +14,12 @@ class animals(Sprite):
 
         self.type = animals
         self.name = Animalz
-        self.speed = random.randint(45,55)/1000.
+        self.speed = random.randint(45,55)/1000 # This is to set an example for the speed.
+        # The speed is selected from a random integer between the two set integers and divided by 1000.
         self.field = game.field_rect
 
-        animal_images = choice([pygame.image.load(f1).convert_alpha(), pygame.image.load(f2).convert_alpha()) for (f1, f2) in game.ANIMAL_FILENAME_LISTS[choice(range(0, len(game.ANIMAL_FILENAME_LISTS)))]])
+        # This is to select the animal images from the folder.
+        animal_images = choice([(pygame.image.load(f1).convert_alpha(), pygame.image.load(f2).convert_alpha()) for (f1, f2) in game.ANIMAL_FILENAME_LISTS[choice(range(0, len(game.ANIMAL_FILENAME_LISTS)))]])
 
         # This represents the un-rotated animal images.
         self.base_image_0 = animal_images[0]
@@ -42,12 +43,12 @@ class animals(Sprite):
         self.health_init = 15 * (game_level * 2 + game_level) + int((game.level*1.5)**2)
         self.health = self.health_init
 
-        self.level = game.level
+        self.level = game.level # game.level represents how many waves the player has survived.
         self.gold = int(round(self.level / 1.99))
         self.damage = 1 # determining the amount of damage the animal does to the base
 
     def is_alive(self):
-        return self.state = (animal.ALIVE, animal.DEAD)
+        return self.state in (animal.ALIVE, animal.DEAD)
 
     # This continuously updates the animals throughout the player's game.
     def update(self, time_passed):
@@ -62,7 +63,7 @@ class animals(Sprite):
             else:
                 assert False
 
-            # This is represents the movement of the animals.
+            # This is to represent the movement of the animals.
             displacement = vec2d(
             self.direction.x * self.speed * time_passed,
             self.direction.y * self.speed * time_passed)
@@ -85,8 +86,8 @@ class animals(Sprite):
             # The animal image is placed at self.pos, allowing for smoother
             # movement even when rotated.
             self.draw_rect = self.image.get_rect().move(
-            self.pos.x - self.image_w / 2,
-            self.pos.y - self.image_h / 2
+                self.pos.x - self.image_w / 2,
+                self.pos.y - self.image_h / 2)
             self.screen.blit(self.image, self.draw_rect)
 
             # Visual aspects of the health bar (10x4 px)
@@ -121,21 +122,22 @@ class animals(Sprite):
     def _die(self):
         self.state = animal.DEAD
         self.game.kills += 1
-        self.game.player_money += self.gold
-        self.game.text_messages.append(widgets.TextMessage(self.game.screen, '+'+str(self.gold), vec2d(self.pos[0], self.pos[1] - 22, duration=1100, size=15))
+        self.game.player_money += int(round(self.level / 1.99))
+        self.game.text_messages.append(widgets.TextMessage(self.game.screen, '+'+str(self.gold), vec2d(self.pos[0], self.pos[1] - 22, duration=1100, size=15)))
 
     # This informs the player if an animal reaches the base.
     # The player loses self.damage lives.
     def _loselife(self):
         self.game.text_messages.append(widgets.TextMessage(self.screen, "-1", self.pos, duration=2000, size=14, initialdelay = 400, color = (245,15,15)))
-        self.game.lose += self.damage
-        self.game.lives -= self.damage
+        self.game.lose += 1
+        self.game.lives -= -1
         self.kill() # This kills the animals once it reaches the player's base.
 
     # This determines where the animals go.
     def _compute_direction(self, time_passed):
         coord = self.game.xy2coord(self.pos)
-    # The animal asks the GAme where it has to go, and it has reached the goal
+
+    # The animal asks the Game where it has to go, and if it has reached the goal
     # The animal leaves the game.
         if self.game.is_gaol_coord(coord):
             self._loselife() # Removes one life and dies.
@@ -154,8 +156,9 @@ class animals(Sprite):
                             next_coord[0] - coord[0]).normalized()
                         break # This means the path is good to go.
                     except:
+                    # These represent the pop up messages.
                         self.game.placed_tower(self.game.last_placed_tower_id - n).sell()
-                        self.game.text_messages.append(widgets.TextMessage(self.game.screen, "Don't block the path!", vec2d(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2, duration = 3000, size = 32, initialdelay = 1000, color = Color("red")))
+                        self.game.text_messages.append(widgets.TextMessage(self.game.screen, "Don't block the path!", vec2d(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2, duration = 3000, size = 32, initialdelay = 1000, color = Color("red"))))
 
     def _point_is_inside(self, point):
         # This answers whether a given point is within the animal's body
@@ -174,7 +177,7 @@ class animals(Sprite):
 
     def _decrease_health(self, n, attacker = None):
         self.health = max(0, self.health - n)
-        if self.health == 0
+        if self.health == 0:
             if animal_fighter and self.state == animal.ALIVE:
                 animal_fighter.tower.add_experience(self.level)
             self._die()
@@ -198,6 +201,7 @@ class GridPath(object):
         else:
             return None
 
+    # This is to calculate the tiles that the animals can move to.
     def _compute_path(self, coord):
         finder = Path(self.map.successors, self.map.move_cost, self.map.move_cost)
         path_list = list(finder.compute_path(coord, self.end))
@@ -211,14 +215,14 @@ class GridPath(object):
 # The monkey is the basic unit.
 class Monkey(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Monvishkar"
         self.speed = random.randint(45,55)/1000
 
 # The turtle is the slow tank.
 class Turtle(animals):
     def __inti__(self, screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Squirtle"
         self.health_init += 1000
         self.health += 1000
@@ -227,7 +231,7 @@ class Turtle(animals):
 # The bear is the fast tank, the boss.
 class Bear(animals):
     def __init__(self,screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Strong Bear"
         self.health_init += 2000
         self.health += 2000
@@ -236,7 +240,7 @@ class Bear(animals):
 # The frog is the faster type of animal.
 class Frog(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Long Frog"
         self.health_init += 50
         self.health_init += 50
@@ -244,7 +248,7 @@ class Frog(animals):
 
 class Fox(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Ryad El Foxy"
         self.health_init += 90
         self.health_init += 90
@@ -252,7 +256,7 @@ class Fox(animals):
 
 class Lizard(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
-        animals.__init__(self, screen, game, init_position, init_direction):
+        animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Sheady Lizard"
         self.health_init += 40
         self.health_init += 40

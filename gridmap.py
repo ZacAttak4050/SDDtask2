@@ -30,7 +30,7 @@ class GridMap():
             self.blocked[coord] = True
         else:
             if coord in self.blocked:
-                del self.blocked[coord]
+                del self.blocked[coord] # If the coord is blocked, delete the coord.
 
     def compute_movement(self, coord1, coord2):
         """ Calculate/compute the cost to move from one coordinate
@@ -44,22 +44,24 @@ class GridMap():
         """ Calculate the adject coordinates
         """
 
-        slist = []
+        slist = [] # empty list for later uses.
 
         for drow in (-1,0,1):
             for dcol in (-1,0,1):
-                if drow == 0 and dcol == 0
-                continue
+                if drow == 0 and dcol == 0:
+                    continue
 
                 newrow = coord[0] + drow
                 newcol = coord[1] + dcol
                 if (    0 <= newrow <= self.xrows - 1 and
                         0 <= newcol <= self.xcols - 1 and
                         self.map[newrow][newcol] == 0):
-                    slist.append((newrow, newcol))
+                    slist.append((newrow, newcol)) # This continuously creates a gridmap for how ever big.
 
         return slist
 
     def printme(self):
         for row in range(self.xrows):
             for col in range(self.xcols):
+                print ("%s" % ('O' if self.map[row][col] else '.')),
+            print ('')

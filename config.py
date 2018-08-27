@@ -14,14 +14,14 @@ mainclock = pygame.time.Clock()
 from textures import *
 
 # Scores
-money = 20
-health = 100
+player_money = 20
+player_health = 100
 
-# Tower Costs
+# Tower Money Costs
 Tower_1 = 5
-Tower_2 = 10
-Tower_3 = 25
-Tower_4 = 50
+Tower_2 = 20
+Tower_3 = 50
+Tower_4 = 100
 
 #Colors for level loading
 BLACK = (0, 0, 0, 255)
@@ -38,8 +38,7 @@ FPS = 60
 TITLE = "Barn Defence"
 BGCOLOR = GRASS
 
-MAP = TILEMAP
-
+VISUAL_MAP = TILEMAP
 
 TILESIZE = 32
 GRIDWIDTH = WIDTH / TILESIZE

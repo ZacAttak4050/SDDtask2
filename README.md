@@ -3,6 +3,7 @@ SDD Task 2 Repository
 This is the tutorial and background information to 'Barn Defencse' made using python and pygame. Please read before playing the game.
 
 Aim of the game:
+
 The animals will escape from their barn and head towards the cabin. 
 Your job is to defend the cabin by placing towers along their path. 
 These towers vary in price according to the damage they do. If any animals reach the cabin you lose lives according to their level.
@@ -10,9 +11,11 @@ However, if you defeat the animals before they reach the base you get money to s
 Your job is to get through as many waves as possible before you run out of lives.
 
 Starting the game:
+
 To open the game open 'main.py' in your chosen python IDE and run the program.
 
 Playing the game:
+
 Select a tower, you won't be able to afford them all from the start.
 Drag it on to the map and let the mouse go. It will place on the tile you released it on.
 After placing your first tower the animals will begin entering the map so be careful.

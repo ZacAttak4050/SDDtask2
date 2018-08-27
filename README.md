@@ -1,4 +1,4 @@
-<strong>SDD Task 2 Repository</strong>
+<em>SDD Task 2 Repository</em>
 
 This is the tutorial and background information to 'Barn Defencse' made using python and pygame. Please read before playing the game.
 

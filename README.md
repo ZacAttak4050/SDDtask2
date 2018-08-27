@@ -24,6 +24,6 @@ This game doesn't end, well, not until you run out of lives anyway.
 
 At this stage you cannot sell or cancel towers once you click them, so be very careful.
 
-Most of all, have fun playing Anthony and Zac's game.
+Most of all, have fun playing Anthony and Zac's game. 👌
 
 NB: No animals were harmed in the making of this game.

@@ -1,4 +1,4 @@
-SDD Task 2 Repository
+<strong>SDD Task 2 Repository</strong>
 
 This is the tutorial and background information to 'Barn Defencse' made using python and pygame. Please read before playing the game.
 
@@ -10,11 +10,11 @@ These towers vary in price according to the damage they do. If any animals reach
 However, if you defeat the animals before they reach the base you get money to spend on more towers. 
 Your job is to get through as many waves as possible before you run out of lives.
 
-Starting the game:
+<b>Starting the game:</b>
 
 To open the game open 'main.py' in your chosen python IDE and run the program.
 
-Playing the game:
+<b>Playing the game:</b>
 
 Select a tower, you won't be able to afford them all from the start.
 Drag it on to the map and let the mouse go. It will place on the tile you released it on.
@@ -26,4 +26,4 @@ At this stage you cannot sell or cancel towers once you click them, so be very c
 
 Most of all, have fun playing Anthony and Zac's game. 👌
 
-NB: No animals were harmed in the making of this game.
+<b>NB: No animals were harmed in the making of this game.</b>

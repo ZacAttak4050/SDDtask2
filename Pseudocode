@@ -1,1 +1,144 @@
+#ALGORITHM
+
+BEGIN Menu:
+	IF lives = 0 THEN Display game over:
+		WHILE game over is TRUE:
+			CASEWHERE continue playing:
+				IF play again:
+					REPEAT BEGIN Main
+				ENDIF
+			ENDCASE
+		ENDWHILE
+	ENDIF
+END Menu
+ 
+BEGIN Config:
+#Basic Scores
+  health = 100
+	money = 20
+#Tower Costs
+	Level 1 Tower = 5
+	Level 2 Tower = 10
+	Level 3 Tower = 25
+	Level 4 Tower = 50
+#Colours
+	BLACK = ( 0, 0, 0, 255)
+	RED = ( 255, 0, 0, 255)
+	YELLOW = ( 255, 255, 0, 255)
+	GREEN = ( 100, 255, 100, 255)
+	BROWN = ( 124, 66, 0, 255)
+	WHITE = ( 255, 255, 255)
+#Display
+	WIDTH = 800
+	HEIGHT = 600
+	FPS = 60
+	TITLE = “Barn Defense”
+#Map
+	BGCOLOR = GRASS
+  MAP = TILEMAP
+	TILESIZE = 32
+	GRIDWIDTH = WIDTH / TILESIZE
+	GRIDHEIGHT = HEIGHT / TILESIZE
+END Config
+ 
+BEGIN Animals:
+	#Animals
+	L1_animal = fox
+	L2_animal = monkey
+	L3_animal = frog
+	L4_animal = lizard
+	L5_animal = turtle
+
+	CASEWHERE animal reaches base
+		L1_animal : Lives -1
+		L2_animal : Lives -2
+		L3_animal : Lives -4
+		L4_animal : Lives -8
+		L5_animal : Lives -16
+	ENDCASE
+
+	CASEWHERE animal is defeated
+		L1_animal : Money +4
+		L2_animal : Money +6
+		L3_animal : Money +8
+		L4_animal : Money +10
+		L5_animal : Money +16
+ENDCASE
+END Animals
+ 
+BEGIN Calculations:
+#Defines functions, classes and other handy calculations for the hidden mechanics of the game
+DEFINE percentage, distance, timer
+	WHILE in game
+		Update percentage, distance, timer as waves commence.
+	ENDWHILE
+END Calculations
+
+BEGIN Gridmap:
+	IF coordinate is blocked
+		THEN animals go around
+	ELIF coordinate is clear
+		THEN animals can go through
+	ELIF coordinate is base
+		THEN decrease lives
+	ELSE continue playing
+	ENDIF
+END Gridmap
+
+BEGIN Tilemap:
+	#Tiles
+	Grass = (49, 99, 0), (‘green’)
+
+	IF tower is on tile
+		THEN animals go around tower
+	ELSE
+		THEN animals can go over
+ENDIF
+END Tilemap
+ 
+BEGIN Towers:
+	#Towers
+	L1_Tower = Tower1
+	L2_Tower = Tower2
+	L3_Tower = Tower3
+	L4_Tower = Tower4
+
+	CASEWHERE animal passing
+		IF animal gets in range of tower
+			THEN begin shooting
+		ELSE do nothing
+		ENDIF
+	ENDCASE
+	CASEWHERE tower placement
+		IF tower clicked
+			THEN place on release
+		ELIF tower unclicked
+			THEN cancel
+		ELSE do nothing
+		ENDIF
+	ENDCASE
+END Towers
+ 
+BEGIN Waves:
+	REPEAT UNTIL lives = 0
+wave = n
+		WHILE Animals defeated = TRUE
+			SET Timer = 5s
+				ONCE Timer = 0
+					DISPLAY n = n+1
+		ENDWHILE
+END Waves
+
+BEGIN Main:
+	IMPORT Menu, Config, Animals, Calculations, Gridmap, Tilemap, Towers
+		IF player places tower THEN:
+			DISPLAY wave(n)
+		ENDIF
+		CASEWHERE: 
+game over = TRUE THEN:
+				DISPLAY menu
+			game over = FALSE THEN:
+				Pass
+		ENDCASE	
+END Main
 

@@ -2,7 +2,7 @@ SDD Task 2 Repository
 
 This is the tutorial and background information to 'Barn Defencse' made using python and pygame. Please read before playing the game.
 
-Aim of the game:
+<b> Aim of the game: <b>
 
 The animals will escape from their barn and head towards the cabin. 
 Your job is to defend the cabin by placing towers along their path. 

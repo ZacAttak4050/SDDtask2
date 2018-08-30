@@ -14,12 +14,12 @@ column = 5
 row = 7
 
 #pygame.display.flip
-pygame.draw.rect(SCREEN, (49, 99, 0), (column*TILESIZE, row*TILESIZE, TILESIZE, TILESIZE))
+pygame.draw.rect(SCREEN, (69, 132, 7), (column*TILESIZE, row*TILESIZE, TILESIZE, TILESIZE))
 
 while True:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       pygame.quit()
       sys.exit()
-    SCREEN.fill((49, 99, 0))
+    SCREEN.fill((69, 132, 7))
   pygame.display.update()

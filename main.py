@@ -1,7 +1,5 @@
 import pygame, sys, os, math, random
-from config import *
 from animals import *
-from textures import *
 from tower import *
 from gridmap import GridMap
 from pathfinder import PathFinder

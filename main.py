@@ -12,7 +12,7 @@ from pygame.sprite import Sprite
 from textmessages import *
 
 class Menu(object):
-    BCKGROUND = 'images/Textures/background.png'
+    BCKGROUND = 'images/Textures/background.jpg'
 
     NEW_GAME_CLICK = pygame.USEREVENT + 143
     EXIT_CLICK = pygame.USEREVENT + 145
@@ -32,14 +32,15 @@ class Menu(object):
 
             self.new_game_text = TextWidget("Start Game", colour = (0, 100, 0), size = 46, highlight_increase = 12, event = self.NEW_GAME_CLICK)
             self.new_game_text.rect.center = self.screen.get_rect().center
-            self.new_game_text.rect.left = 300
+            self.new_game_text.rect.top += 90
+            self.new_game_text.rect.left = 70
 
             self.text_widgets.append(self.new_game_text)
 
             self.exit_text = TextWidget("Exit Game", colour = (0, 100, 0), size = 46, highlight_increase = 12, event = self.EXIT_CLICK)
             self.exit_text.rect.center = self.screen.get_rect().center
-            self.exit_text.rect.top += 100
-            self.exit_text.rect.left = 300
+            self.exit_text.rect.top += 140
+            self.exit_text.rect.left = 70
             self.text_widgets.append(self.exit_text)
 
         else:
@@ -89,10 +90,12 @@ class Menu(object):
                     elif (event.type == pygame.MOUSEBUTTONDOWN):
                         for text in self.text_widgets:
                             text.on_mouse_button_down(event)
+                            print('GOOD')
 
                     elif (event.type == pygame.MOUSEBUTTONUP):
                         for text in self.text_widgets:
                             text.on_mouse_button_up(event)
+                            print('GOOD')
 
                     elif (event.type == self.NEW_GAME_CLICK):
                         self.run_game()
@@ -118,6 +121,7 @@ class Menu(object):
     def run_game(self):
         self.game = Game(self.screen)
         self.game.run()
+        print("IT RUNS")
         del self
 
     def quit(self):
@@ -297,7 +301,9 @@ class Game(object):
         return None
 
     def draw_background(self):
-        self.screen.blitz(self.bck_img, (0,0))
+        TILESIZE = 32
+
+        self.screen.blit(self.bck_img, (0,0))
 
     def draw_portals(self):
         """ This is to draw up the entrances/exits of the animals, or known as

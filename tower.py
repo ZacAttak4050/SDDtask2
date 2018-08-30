@@ -1,5 +1,4 @@
 import sys, os, pygame, math
-from config import *
 from calculations import *
 from main import *
 from animals import *

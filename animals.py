@@ -1,5 +1,4 @@
 import pygame
-from config import *
 from main import *
 from calculations import get_Percentage
 

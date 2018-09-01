@@ -11,9 +11,10 @@ class GridMap():
     """
 
     def __init__(self, xrows, xcols):
-        self.xrows = xrows
-        self.xcols = xcols
-        self.map = [[0] * self.xcols for i in range(xrows)]
+        self.xrows = int(xrows)
+        self.xcols = int(xcols)
+        self.map = [[0] * self.xcols for i in range(self.xrows)]
+
         """ "Lambda" creates an anonymous function. i.e, a function
              that does not need to be named.
         """
@@ -44,7 +45,7 @@ class GridMap():
         """ Calculate the adject coordinates
         """
 
-        slist = [] # empty list for later uses.
+        slist = []
 
         for drow in (-1,0,1):
             for dcol in (-1,0,1):

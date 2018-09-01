@@ -3,16 +3,20 @@ from main import *
 from calculations import get_Percentage
 
 class animals(Sprite):
-    def __init__(self, screen, x, y, level, game, init_position=None, init_direction = (1,1)):
+    def __init__(self, screen, game, init_position=None, init_direction = (1,1)):
+        """ Create the animal. """
+
         Sprite.__init__(self)
         self.id = game.animal_count
         self.screen = screen
         self.game = game
-        self.x = x
-        self.y = y
+
+        if not init_position:
+            init_position = (game.field_rect.left + game.GRID_SIZE / 2,game.field_rect.top + game.GRID_SIZE / 2)
 
         self.type = animals
         self.name = Animalz
+
         self.speed = random.randint(45,55)/1000 # This is to set an example for the speed.
         # The speed is selected from a random integer between the two set integers and divided by 1000.
         self.field = game.field_rect
@@ -77,7 +81,8 @@ class animals(Sprite):
 
         # When the animal is dead, the entity disappears (no animation)
         elif self.state == animal.DEAD:
-            self.__die()
+            self._die()
+            pass
 
     # Blitting the animals onto the constructed screen.
     def draw(self):
@@ -123,6 +128,7 @@ class animals(Sprite):
         self.game.kills += 1
         self.game.player_money += int(round(self.level / 1.99))
         self.game.text_messages.append(widgets.TextMessage(self.game.screen, '+'+str(self.gold), vec2d(self.pos[0], self.pos[1] - 22, duration=1100, size=15)))
+        self.kill()
 
     # This informs the player if an animal reaches the base.
     # The player loses self.damage lives.
@@ -138,7 +144,7 @@ class animals(Sprite):
 
     # The animal asks the Game where it has to go, and if it has reached the goal
     # The animal leaves the game.
-        if self.game.is_gaol_coord(coord):
+        if self.game.is_goal_coord(coord):
             self._loselife() # Removes one life and dies.
         else:
             x_mid, y_mid = self.game.coord2xy_mid(coord)
@@ -146,16 +152,20 @@ class animals(Sprite):
             if ((x_mid - self.pos.x) * (x_mid - self.prev_pox.s) < 0 or
                 (y_mid - self.pos.y) * (y_mid - self.prev_pos.y) < 0):
 
+                next_coord = self.game.next_on_path(coord)
+
                 success = False
                 for n in range(0, 900):
+
                     try:
                         next_coord = self.game.next_on_path(coord)
                         self.direction = vec2d(
                             next_coord[1] - coord[1],
                             next_coord[0] - coord[0]).normalized()
+
                         break # This means the path is good to go.
                     except:
-                    # These represent the pop up messages.
+                        # These represent the pop up messages.
                         self.game.placed_tower(self.game.last_placed_tower_id - n).sell()
                         self.game.text_messages.append(widgets.TextMessage(self.game.screen, "Don't block the path!", vec2d(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2, duration = 3000, size = 32, initialdelay = 1000, color = Color("red"))))
 
@@ -183,10 +193,10 @@ class animals(Sprite):
 
 # GridPath is sourced from the GridMap.
 class GridPath(object):
-    def __init__(self, xrows, xcols, end):
+    def __init__(self, xrows, xcols, goal):
         self.map = GridMap(xrows, xcols)
         # the 'end' is the base of the humans.
-        self.end = end
+        self.goal = goal
         self._path_cache = {}
 
     def get_next_coordinate(self, coord):

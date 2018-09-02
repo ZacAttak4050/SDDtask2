@@ -1,38 +1,45 @@
+
 import os, sys
 
-import math, random
 from random import randint, choice
 from math import sin, cos, radians, ceil, floor
 
+# --- pygame-related ---
 import pygame
 from pygame import Rect, Color
 from pygame.sprite import Sprite
 
-
+# --- .py files ---
 from animals import *
 from tower import *
 from gridmap import GridMap
 from pathfinder import PathFinder
 from calculations import Timer
 from vec2d import vec2d
-from textmessages import *
+from widgets import *
 
 global menu
 
+# --- Menu ---
 
 class Menu(object):
+    # Background image for the menu.
     BCKGROUND = 'images/Textures/background.jpg'
+    background2 = 'images/Textures/ExampleDirt.jpg'
 
+    # Assigns userevents.
     NEW_GAME_CLICK = pygame.USEREVENT + 1
     EXIT_CLICK = pygame.USEREVENT + 2
 
+
     def __init__(self, screen, pause = False, game = None):
         self.background_img = pygame.image.load(self.BCKGROUND).convert_alpha()
+        self.background22 = pygame.image.load(self.background2).convert_alpha()
         self.screen = screen
         self.pause = pause
         self.game = game
 
-        self.text_widgets = []
+        self.text_widgets = [] # Empty list for text widgets.
 
         self.main()
 
@@ -52,6 +59,7 @@ class Menu(object):
             self.exit_text.rect.center = self.screen.get_rect().center
             self.exit_text.rect.top += 140
             self.exit_text.rect.left = 70
+
             self.text_widgets.append(self.exit_text)
 
         else:
@@ -69,6 +77,7 @@ class Menu(object):
     def loop(self):
         self.resume = False
         while True:
+            # --- Updates display ---
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -104,15 +113,20 @@ class Menu(object):
                     elif (event.type == pygame.MOUSEBUTTONDOWN):
                         for text in self.text_widgets:
                             text.on_mouse_button_down(event)
-                            print("DOWN")
+                            # print("DOWN")
+                            # ^ was to check.
 
                     elif (event.type == pygame.MOUSEBUTTONUP):
                         for text in self.text_widgets:
                             text.on_mouse_button_up(event)
-                            print('UP')
+                            # print('UP')
+                            # ^ was to check.
 
                     elif (event.type == self.NEW_GAME_CLICK):
                         pygame.mouse.set_cursor(*pygame.cursors.arrow)
+                        # self.screen.blit(self.background22, (0,0))
+                        # pygame.display.update()
+                        print('It runs')
                         self.run_game()
 
                     elif (event.type == self.EXIT_CLICK):
@@ -132,19 +146,23 @@ class Menu(object):
             if (rect):
                 rects.append(rect)
         pygame.display.update(rects)
+        pygame.display.flip()
 
     def run_game(self):
         self.game = Game(self.screen)
         self.game.run()
+        pygame.display.update()
         print("IT RUNS")
         del self
 
     def quit(self):
-        if True:
-            pygame.quit()
-            sys.exit()
+        pygame.quit()
+        sys.exit()
 
 class Game(object):
+    # --- Bases ---
+    ANIMAL_BASE = 'images/8 Bit Art/Barn.png'
+    PLAYER_BASE = 'images/8 Bit Art/logcabin.png'
 
     background_image = 'images/Textures/dirt.png'
     # These are the screen dimensions.
@@ -182,6 +200,8 @@ class Game(object):
         self.screen = screen
         self.bck_img = pygame.image.load(self.background_image).convert_alpha()
         self.bck_img_rect = self.bck_img.get_rect()
+
+        # --- Size of the Field ---
         self.field_border_width = 4
         field_outer_width = self.FIELD_SIZE[0] + 2 * self.field_border_width
         field_outer_height = self.FIELD_SIZE[1] + 2 * self.field_border_width
@@ -190,27 +210,29 @@ class Game(object):
         self.field_border_color = Color(0, 0, 0)
         self.field_box = Box(self.screen, rect = self.field_rect_outer, bgcolor = self.field_bgcolor, border_width = self.field_border_width, border_color = self.field_border_color)
 
+        # --- Deploys the created rectangles onto the display ---
         self.field_rect = self.get_field_rect()
         self.deploy_rect = Rect(20, 60, self.FIELD_SIZE[0] - 20, self.FIELD_SIZE[1] - 20)
 
+        # --- Entrances and Exits ---
         self.entrance_rect = Rect(self.field_rect.left, self.field_rect.top, self.GRID_SIZE*2, self.GRID_SIZE*2)
 
         self.exit_rect = Rect(self.field_rect.right - self.GRID_SIZE * 2, self.field_rect.bottom - self.GRID_SIZE * 2, self.GRID_SIZE * 2, self.GRID_SIZE * 2)
 
-        # Message Board
-        """ The message board contains the player's statistics """
+        # --- Message Board ---
+        """ The message board contains the player's statistics. """
         self.mboard_text = []
         self.mboard_rect = Rect(660, 80, 130, 140)
         self.mboard_bgcolor = Color(50, 20 , 0)
         self.mboard = MessageBoard(self.screen, rect = self.mboard_rect, bgcolor = self.mboard_bgcolor, border_width = 4, border_color = Color('black'), text = self.mboard_text, font = ('calibri', 16), font_color = Color('white'))
 
-        # Misc
+        # --- Misc ---
         self.placing_tower = False
         self.placing_tower_type = [0,1]
         self.place_tower_draw_pos = None
         self.text_messages = []
 
-        #Statistics
+        # --- Statistics ---
         self.level = 1
         self.kills = 0
         self.attack = 0
@@ -220,8 +242,9 @@ class Game(object):
         self.victory = False
         self.tower_count = 0
         self.animal_count = 0
+        self.animal_spawn_count_level = 0
 
-        # These are for the state of the game.
+        # --- State of Game ---
         self.level_complete = False
         self.game_over = False
         self.clock = pygame.time.Clock()
@@ -229,7 +252,7 @@ class Game(object):
 
         self.money_image = pygame.image.load('images/Textures/money.png').convert_alpha()
 
-        """ Create the grid path representation """
+        # --- Grid Representation over the field. ---
         self.grid_xrows = self.FIELD_SIZE[1] / self.GRID_SIZE
         self.grid_xcols = self.FIELD_SIZE[0] / self.GRID_SIZE
         self.goal_coord = (self.grid_xrows - 1, self.grid_xcols - 1)
@@ -238,7 +261,7 @@ class Game(object):
             xcols = self.grid_xcols,
             goal = self.goal_coord)
 
-        # This is an option for whether or not the player can see the grid representation.
+        # --- Representation of grid (optional) ---
         self.options = dict(draw_grid = False)
 
         self.towers = pygame.sprite.Group()
@@ -266,7 +289,7 @@ class Game(object):
 
     def drawing_place_tower(self, pos):
         """ Draws the tower when the player is deciding where to place it. """
-        Type = self.tower_type
+        Type = self.placing_tower_type
         try:
             image = self.tower_templates[Type[1] - 1].image
         except:
@@ -286,10 +309,20 @@ class Game(object):
 
     def place_tower(self, pos):
         """ Designates where the placement of the tower is. """
-        Type = self.tower_type
+        Type = self.placing_tower_type
         self.place_tower = False
         self.place_tower_draw_pos = None
-        self.add_tower = (Type, self.screen, self, pos)
+
+        coord = self.xy2coord(pos)
+        snap_pos = self.coord2xy(coord)
+
+        if self.field_inner_rect.collidepoint(snap_pos) and self.field_inner_rect.collidepoint((snap_pos[0] + 38, snap_pos[1] + 30)):
+            self.add_tower(Type, self.screen, self, pos)
+
+        else:
+            self.text_messages.append(widgets.Textmessage(self.screen, "Not within game field!", vec2d(self.screen.get_width() / 2, self.screen.get_height() / 2), duration = 3800, size = 32, initialdelay = 1000, color = Color("red")))
+
+            self.money += self.tower_templates[self.placing_tower_type[1] - 1].cost
 
     def add_tower(self, Type, screen, game, pos):
         """ Function adds the towers into the game. """
@@ -318,7 +351,7 @@ class Game(object):
         """
         xrow, xcol = coord
         return (self.field_rect.left + xcol * self.GRID_SIZE + self.GRID_SIZE / 2,
-                self.field_rect.top + xrow * self.GRID_SIZE + self.GRID_SIZE / 2)
+        self.field_rect.top + xrow * self.GRID_SIZE + self.GRID_SIZE / 2)
 
     def get_field_rect(self):
         """ Return the internal field rect excluding the border """
@@ -340,6 +373,7 @@ class Game(object):
             eval(self.add_animal_expression)
             self.animal_count += 1
             self.animal_spawn_count_level += 1
+
         except NameError:
             self.victory = True
 
@@ -350,25 +384,26 @@ class Game(object):
         return None
 
     def draw_background(self):
-        self.screen.fill(Color(69,132,7))
-        #self.screen.blit(self.bck_img, (0,0))
+        # self.screen.fill(Color(69,132,7))
+        self.screen.blit(self.bck_img, (0,0))
 
     def draw_portals(self):
-        """ This is to draw up the entrances/exits of the animals, or known as
-            the bases of the animals and the player.
+        """ This is to draw up the entrances/exits of the animals, or known as the bases of the animals and the player.
         """
-        ANIMAL_BASE = 'images/8 Bit Art/Barn.png'
+        # --- Entrance for the animals ---
         self.animal_base = pygame.image.load(self.ANIMAL_BASE).convert_alpha()
+        self.screen.blit(self.animal_base, (0, 0))
+
         entrance = pygame.Surface((self.entrance_rect.w, self.entrance_rect.h))
         entrance.fill(Color(0,0,0))
         entrance.set_alpha(150)
         self.screen.blit(entrance, self.entrance_rect)
 
-        PLAYER_BASE = 'images/8 Bit Art/logcabin.png'
+        # --- Exit for the animals ---
         self.player_base = pygame.image.load(self.PLAYER_BASE).convert_alpha()
-        self.screen.blit(self.player_base, (603,528))
+        self.screen.blit(self.player_base, (0, 0))
 
-        exit = pygame.Surface((sefl.exit_rect.w, self.exit_rect.h))
+        exit = pygame.Surface((self.exit_rect.w, self.exit_rect.h))
         exit.fill(Color(200, 80, 80))
         exit.set_alpha(150)
         self.screen.blit(exit, self.exit_rect)
@@ -401,15 +436,15 @@ class Game(object):
         self.screen.blit(self.fps, (650, 20))
 
         for tower in self.towers:
-            tower.draw()
-            if tower == self.selection and self.selection_info_active:
+            tower.draw(self.time_passed)
+            if tower == self.selection and self.selection_info_active: # selection and selection info are yet to be defined... This was to display the statistics of the selected tower.
                 pygame.draw.circle(self.screen, Color('grey'), tower.rect.center, tower.radius, 2)
 
         for animal in self.animals:
             animal.draw()
 
-        if self.placing_tower and self.place_tower_pos:
-            self.place_tower(self.place_tower_pos)
+        if self.placing_tower and self.place_tower_draw_pos:
+            self.place_tower_draw(self.place_tower_draw_pos)
         self.draw_portals()
 
     def run(self):
@@ -420,9 +455,11 @@ class Game(object):
         while True:
             # Limits the speed to 30 FPS.
             self.time_passed = self.clock.tick(40) # FPS
+
             self.total_time_passed += self.time_passed
+
             try:
-                self.FPS - 1 / (self.time_passed / 1000.0)
+                self.FPS = 1 / (self.time_passed / 1000.0)
             except:
                 self.FPS = 999
                 # This si to determine whether too long has passed between two frames.
@@ -524,67 +561,68 @@ class Game(object):
                                 if Collision:
                                     break
 ############################################################################################################
-                        if not self.paused and not self.game_over:
-                           """ This is for the player statistics/board, which
-                               hasn't been created yet.
-                           """
+            if not self.paused and not self.game_over:
+                """ This is for the player statistics/board.
+                """
 
-                           msg1 = 'Animals: %d' % len(self.animals)
-                           msg2 = 'Gold: %d' % self.player_money
-                           msg3 = 'Lives: %d' % self.player_health
-                           msg4 = 'Kills: %d' % self.Kills
-                           msg5 = ''
+                msg1 = 'Animals: %d' % len(self.animals)
+                msg2 = 'Gold: %d' % self.player_money
+                msg3 = 'Lives: %d' % self.player_health
+                msg4 = 'Kills: %d' % self.kills
+                msg5 = ''
 
-                           if self.player_health <= 0:
-                               msg5 = 'GG!'
-                               if not self.game_over:
-                                   self.GameOver()
+                if self.player_health <= 0:
+                    msg5 = 'GG!'
+                    if not self.game_over:
+                         self.GameOver()
 
-                        elif self.victory and self.player_health:
-                           msg5 = 'Victory!'
-                           if not self.game_over:
-                               self.Victory()
+                elif self.victory and self.player_health:
+                    msg5 = 'Victory!'
+                    if not self.game_over:
+                        self.Victory()
 
-                        font = pygame.font.SysFont('calibri', 24)
-                        font.set_bold = True
-                        self.fps = font.render('FPS: ' + str(int(self.FPS)), True, (0, 0, 0))
+                font = pygame.font.SysFont('calibri', 24)
+                font.set_bold(True)
+                self.fps = font.render('FPS: ' + str(int(self.FPS)), True, (0, 0, 0))
 #############################################################################################################################
 
-                        self.mboard_text = [msg1, msg2, msg3, msg4, msg5]
+                self.mboard_text = [msg1, msg2, msg3, msg4, msg5]
 
-                        if not len(self.animals) and self.animal_count >= self.ANIMALS_PER_LEVEL:
-                            if self.level_complete == False and self.animal_count >= self.ANIMALS_PER_LEVEL:
-                                self.level_complete = True
+                if not len(self.animals) and self.animal_count >= self.ANIMALS_PER_LEVEL:
+                    if self.level_complete == False and self.animal_count >= self.ANIMALS_PER_LEVEL:
+                        widgets.TextMessage(self.screen, "Level Complete!", vec2d(self.screen.get_width() / 2, self.screen.get_height() / 2), duration = 3800, size = 32, initialdelay = 800)
+                        self.level_complete = True
 
                             #if self.level_timer:
                                 #self.tboard_text = ['Level ' + str(self.level) + ' Starts in...' + str(int(self.level_timer.interval - self.level_timer.time) / 1000)]
 
-                        else:
-                            if self.level_complete == True:
-                                self.level_complete = False
+                else:
+                    if self.level_complete == True:
+                        self.level_complete = False
                             #self.tboard.text = ['Level ' + str(self.level)]
 
-                        if self.animal_spawn_timer:
+                if self.animal_spawn_timer:
                             self.animal_spawn_timer.update(self.time_passed)
 
-                        if self.level_timer:
-                            self.level_timer.update(self.time_passed)
+                if self.level_timer:
+                    self.level_timer.update(self.time_passed)
 
-                        for animal in self.animals:
-                            animal.update(self.time_passed)
+                for animal in self.animals:
+                    animal.update(self.time_passed)
 
-                        for tower in self.towers:
-                            possible_targets = []
+                for tower in self.towers:
+                    possible_targets = []
 
-                            for animal in self.animmals:
-                                Collision = pygame.sprite.collide_circle(animal, tower)
-                                if Collision and animal.health > 0:
-                                    possible_targets.append(animal_id)
-                            if possible_targets:
-                                tower.fire(possible_targets)
-                        if not self.game_over:
-                            self.draw()
-                            pygame.display.flip()
+                for animal in self.animals:
+                    Collision = pygame.sprite.collide_circle(animal, tower)
+                    if Collision and animal.health > 0:
+                        possible_targets.append(animal_id)
+                    if possible_targets:
+                        tower.fire(possible_targets)
+                if not self.game_over:
+                    self.draw()
+                    pygame.display.update()
+                    pygame.display.flip()
 
     def Victory(self):
         self.game_over = True
@@ -593,7 +631,7 @@ class Game(object):
         overlay.fill(Color(100,10,10))
         overlay.set_alpha(220)
         self.screen.blit(overlay, (0,0))
-        widgets.Textmessage(self.screen, "Victory!", vec2d(self.screen.get_width() / 2, (self.screen.get_height() / 2)+ 50), duration = 0, size = 32, flashy = False).draw()
+        # widgets.Textmessage(self.screen, "Victory!", vec2d(self.screen.get_width() / 2, self.screen.get_height() / 2), duration = 0, size = 32, flashy = False).draw()
         pygame.display.flip()
 
     def GameOver(self):

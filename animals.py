@@ -84,11 +84,10 @@ class animals(Sprite):
             self._die()
             pass
 
-    # Blitting the animals onto the constructed screen.
     def draw(self):
+        """ Blit the animal onto the screen. """
         if self.state == animal.ALIVE:
-            # The animal image is placed at self.pos, allowing for smoother
-            # movement even when rotated.
+            # The animal image is placed at self.pos, allowing for smoother movement even when rotated.
             self.draw_rect = self.image.get_rect().move(
                 self.pos.x - self.image_w / 2,
                 self.pos.y - self.image_h / 2)
@@ -222,14 +221,14 @@ class GridPath(object):
 
 """ The names of the animals are just references to close friends. """
 # The monkey is the basic unit.
-class Monkey(animals):
+class Animal_1(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Monvishkar"
         self.speed = random.randint(45,55)/1000
 
 # The turtle is the slow tank.
-class Turtle(animals):
+class Animal_2(animals):
     def __inti__(self, screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Squirtle"
@@ -238,7 +237,7 @@ class Turtle(animals):
         self.speed = random.randint(20,30)/1000
 
 # The bear is the fast tank, the boss.
-class Bear(animals):
+class Animal_3(animals):
     def __init__(self,screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Strong Bear"
@@ -247,7 +246,7 @@ class Bear(animals):
         self.speed = random.randint(45,55)/1000
 
 # The frog is the faster type of animal.
-class Frog(animals):
+class Animal_4(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Long Frog"
@@ -255,7 +254,7 @@ class Frog(animals):
         self.health_init += 50
         self.speed = random.randint(65,75)/1000
 
-class Fox(animals):
+class Animal_5(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Ryad El Foxy"
@@ -263,7 +262,7 @@ class Fox(animals):
         self.health_init += 90
         self.speed = random.randint(50,60)/1000
 
-class Lizard(animals):
+class Animal_6(animals):
     def __init__(self, screen, game, init_position = None, init_direction = (1,1)):
         animals.__init__(self, screen, game, init_position, init_direction)
         self.name = "Sheady Lizard"

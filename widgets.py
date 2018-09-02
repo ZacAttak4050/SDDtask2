@@ -156,8 +156,8 @@ class Textmessage(object):
         self.size = size
         self.color = color
         self.font = pygame.font.SysFont('calibri', self.size)
-        self.font.set_bold = True
-        self.textstring = Text
+        self.font.set_bold(True)
+        self.textstring = text
         self.text = self.font.render(text, True, color)
         self.duration = duration
         self.initialdelay = initialdelay

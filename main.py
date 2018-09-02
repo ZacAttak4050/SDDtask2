@@ -66,11 +66,11 @@ class Menu(object):
             menutextstring = "Press SPACE to resume game."
             overlay = pygame.Surface((self.screen.get_width(), self.screen.get_height()))
             overlay.fill(Color(10, 10, 10))
-            overlay.set_alpha(220)
+            overlay.set_alpha(1)
             self.screen.blit(overlay, (0,0))
             menufont = pygame.font.SysFont('calibri', 30)
-            menurect = pygame.Rect(200, 200, 400, 200)
-            textsurface = widgets.render_textrect(menutextstring, menufont, menurect, (130, 40, 0), (0,0,0), justification = 0)
+            menurect = pygame.Rect(100, 100, 400, 50)
+            textsurface = render_textrect(menutextstring, menufont, menurect, (0, 255, 0), (139,69,19), justification = 1)
             self.screen.blit(textsurface, (200, 200))
         self.loop()
 
@@ -126,7 +126,7 @@ class Menu(object):
                         pygame.mouse.set_cursor(*pygame.cursors.arrow)
                         # self.screen.blit(self.background22, (0,0))
                         # pygame.display.update()
-                        print('It runs')
+                        # print('It runs')
                         self.run_game()
 
                     elif (event.type == self.EXIT_CLICK):
@@ -152,7 +152,7 @@ class Menu(object):
         self.game = Game(self.screen)
         self.game.run()
         pygame.display.update()
-        print("IT RUNS")
+        # print("IT RUNS")
         del self
 
     def quit(self):
@@ -164,7 +164,7 @@ class Game(object):
     ANIMAL_BASE = 'images/8 Bit Art/Barn.png'
     PLAYER_BASE = 'images/8 Bit Art/logcabin.png'
 
-    background_image = 'images/Textures/dirt.png'
+    background_image = 'images/Textures/background.jpg'
     # These are the screen dimensions.
     SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
     # This is the size of each individual grid.
@@ -173,22 +173,22 @@ class Game(object):
     FIELD_SIZE = 620, 500
 
     # This is the directory path for the images of the animals.
-    ANIMAL_1 = [
+    ANIMAL_1_FILENAMES = [
     ('images/Animals/monkey.png')
     ]
-    ANIMAL_2 = [
+    ANIMAL_2_FILENAMES = [
     ('images/Animals/frog.png')
     ]
-    ANIMAL_3 = [
+    ANIMAL_3_FILENAMES = [
     ('images/Animals/turtle.png')
     ]
-    ANIMAL_4 = [
+    ANIMAL_4_FILENAMES = [
     ('images/Animals/fox.png')
     ]
-    ANIMAL_5 = [
+    ANIMAL_5_FILENAMES = [
     ('images/Animals/lizard.png')
     ]
-    ANIMAL_6 = [
+    ANIMAL_6_FILENAMES = [
     ('images/Animals/bear.png')
     ]
 
@@ -206,7 +206,7 @@ class Game(object):
         field_outer_width = self.FIELD_SIZE[0] + 2 * self.field_border_width
         field_outer_height = self.FIELD_SIZE[1] + 2 * self.field_border_width
         self.field_rect_outer = Rect(20, 60, field_outer_width, field_outer_height)
-        self.field_bgcolor = Color(80, 50, 50, 100)
+        self.field_bgcolor = Color(139,69,19)
         self.field_border_color = Color(0, 0, 0)
         self.field_box = Box(self.screen, rect = self.field_rect_outer, bgcolor = self.field_bgcolor, border_width = self.field_border_width, border_color = self.field_border_color)
 
@@ -231,6 +231,9 @@ class Game(object):
         self.placing_tower_type = [0,1]
         self.place_tower_draw_pos = None
         self.text_messages = []
+
+        # --- Animal Images ---
+        self.animal_images_expression_base = "[(pygame.imageg.load(f1).convert_alpha(), pygame.image.load(f2).convert_alpha()) for (f1, f2) in game.ANIMAL_X_FILENAMES]".split('X')
 
         # --- Statistics ---
         self.level = 1
@@ -262,11 +265,11 @@ class Game(object):
             goal = self.goal_coord)
 
         # --- Representation of grid (optional) ---
-        self.options = dict(draw_grid = False)
+        self.options = dict(draw_grid = True)
 
         self.towers = pygame.sprite.Group()
         self.tower_call_expression_base = "self.towers.add(Tower1(_screen, _game, position = pos))".split('1')
-        self.add_animal_expression_base = "self.animals.add(Animal_*(screen = self.screen, game = self))".split('*')
+        self.add_animal_expression_base = "self.animal.add(Animal_*(screen = self.screen, game = self))".split('*')
 
         # Creates the group of animals as well as the very first animal to come.
         self.animals = pygame.sprite.Group()
@@ -324,7 +327,7 @@ class Game(object):
 
             self.money += self.tower_templates[self.placing_tower_type[1] - 1].cost
 
-    def add_tower(self, Type, screen, game, pos):
+    def add_tower(self, Type, _screen, _game, pos):
         """ Function adds the towers into the game. """
         tower_call_expression = ''.join([self.tower_call_expression_base[0], str(Type[1]), self.tower_call_expression_base[1]])
         eval(tower_call_expression)
@@ -362,8 +365,8 @@ class Game(object):
         return coord == self.goal_coord
 
     def spawn_new_animal(self):
-        """ This function is focused around the spawning of the animals. """
-        if self.animal_spawn_count_level >= self.ANIMALS_PER_LEVEL and not len(self.animals):
+        """ This function is focused around the whether to spawn the animal. """
+        if self.animal_spawn_count_level >= self.ANIMALS_PER_LEVEL and not len(self.animal):
             self.level_finished()
             return
         elif self.animal_spawn_count_level >= self.ANIMALS_PER_LEVEL:
@@ -384,41 +387,44 @@ class Game(object):
         return None
 
     def draw_background(self):
-        # self.screen.fill(Color(69,132,7))
-        self.screen.blit(self.bck_img, (0,0))
+        self.screen.fill(Color(69,132,7))
+        # self.screen.blit(self.bck_img, (0,0))
 
     def draw_portals(self):
         """ This is to draw up the entrances/exits of the animals, or known as the bases of the animals and the player.
         """
         # --- Entrance for the animals ---
         self.animal_base = pygame.image.load(self.ANIMAL_BASE).convert_alpha()
-        self.screen.blit(self.animal_base, (0, 0))
+        self.screen.blit(self.animal_base, (20, 60))
 
         entrance = pygame.Surface((self.entrance_rect.w, self.entrance_rect.h))
-        entrance.fill(Color(0,0,0))
-        entrance.set_alpha(150)
+        # entrance.fill(Color(0,0,0))
+        entrance.set_alpha(1)
         self.screen.blit(entrance, self.entrance_rect)
 
         # --- Exit for the animals ---
         self.player_base = pygame.image.load(self.PLAYER_BASE).convert_alpha()
-        self.screen.blit(self.player_base, (0, 0))
+        self.screen.blit(self.player_base, (600, 520))
 
         exit = pygame.Surface((self.exit_rect.w, self.exit_rect.h))
-        exit.fill(Color(200, 80, 80))
-        exit.set_alpha(150)
+        # exit.fill(Color(200, 80, 80))
+        exit.set_alpha(1)
         self.screen.blit(exit, self.exit_rect)
 
     def draw_grid(self):
-        """ This function draws the gridmap of the game which allows for the player
-            to easily place towers.
+        """ This function draws the gridmap of the game which allows for the player to easily place towers.
         """
 
-        for y in range(self.grid_xrows + 1):
+        for y in range(int(self.grid_xrows + 1)):
             pygame.draw.line(
                 self.screen,
                 Color(50, 50, 50),
                 (self.field_rect.left, self.field_rect.top + y * self.GRID_SIZE - 1),
                 (self.field_rect.right - 1, self.field_rect.top + y * self.GRID_SIZE - 1))
+
+        for x in range(int(self.grid_xcols + 1)):
+            pygame.draw.line(
+                self.screen, Color(50,50,50), (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.top), (self.field_rect.left + x * self.GRID_SIZE - 1, self.field_rect.bottom - 1))
 
     def draw(self):
         """ This function is to draw up all the other functions. """
@@ -628,10 +634,12 @@ class Game(object):
         self.game_over = True
         self.paused = True
         overlay = pygame.Surface((self.screen.get_width(), self.screen.get_height()))
-        overlay.fill(Color(100,10,10))
+        overlay.fill(Color(102,255,102))
         overlay.set_alpha(220)
         self.screen.blit(overlay, (0,0))
-        # widgets.Textmessage(self.screen, "Victory!", vec2d(self.screen.get_width() / 2, self.screen.get_height() / 2), duration = 0, size = 32, flashy = False).draw()
+        Textmessage(self.screen, "Victory!", vec2d(self.screen.get_width() / 2, self.screen.get_height() / 2), duration = 0, size = 32, flashy = False, color = Color(204, 0, 204)).draw()
+        Textmessage(self.screen, "Press Space to return to Menu", vec2d(self.screen.get_width()/2, self.screen.get_height()/2+50), duration = 0, size = 16, flashy = False, color = Color(204, 0, 204)).draw()
+
         pygame.display.flip()
 
     def GameOver(self):
@@ -641,7 +649,9 @@ class Game(object):
         overlay.fill(Color(100, 10, 10))
         overlay.set_alpha(220)
         self.screen.blit(overlay, (0,0))
-        widgets.Textmessage(self.screen, "Game Over!", vec2d(self.screen.get_width() / 2, (self.screen.get_height() / 2)+50), duration = 0, size = 32, flashy = False).draw()
+        Textmessage(self.screen, "Game Over!", vec2d(self.screen.get_width() / 2, (self.screen.get_height() / 2)), duration = 0, size = 32, flashy = False, color = Color(128, 128, 128)).draw()
+        Textmessage(self.screen, "Press Space to return to Menu", vec2d(self.screen.get_width()/2, self.screen.get_height()/2+50), duration = 0, size = 16, flashy = False, color = Color(128, 128, 128)).draw()
+
         pygame.display.flip()
 
     def quit(self):

@@ -119,13 +119,13 @@ BEGIN Towers:
 	ENDCASE
 END Towers
  
-BEGIN Waves:
+BEGIN Waves: # This isn't a separate module but is rather included into the main module. Decided it was important enough and hence why it is included.
 	REPEAT UNTIL lives = 0
 wave = n
 		WHILE Animals defeated = TRUE
-			SET Timer = 5s
+			SET Timer = 10s
 				ONCE Timer = 0
-					DISPLAY n = n+1
+					DISPLAY waves (n = n+1)
 		ENDWHILE
 END Waves
 
@@ -133,6 +133,7 @@ BEGIN Main:
 	IMPORT Menu, Config, Animals, Calculations, Gridmap, Tilemap, Towers
 		IF player places tower THEN:
 			DISPLAY wave(n)
+			Begin Wave(n)
 		ENDIF
 		CASEWHERE: 
 game over = TRUE THEN:
